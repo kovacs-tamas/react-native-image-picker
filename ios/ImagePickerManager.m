@@ -20,6 +20,45 @@
 
 @implementation ImagePickerManager
 
+UIViewController *__nullable RCTPresentedViewControllerCustom(void)
+{
+    if (RCTRunningInAppExtension()) {
+        return nil;
+    }
+
+    NSString *neededClassName = @"eportrait_sdk.EPortraitSDKViewController";
+    UIViewController *controller = RCTKeyWindow().rootViewController;
+    UIViewController *presentedController = controller.presentedViewController;
+
+    NSLog(@"Needed viewcontroller %@",  neededClassName);
+    NSLog(@"controller %@", NSStringFromClass([controller class]));
+    NSLog(@"presentedController %@", NSStringFromClass([presentedController class]));
+
+
+
+    while (presentedController && ![presentedController isBeingDismissed]) {
+
+        controller = presentedController;
+
+        NSString *strClass = NSStringFromClass([controller class]);
+
+
+        NSLog(@"Testing %@", strClass);
+
+        if (strClass == neededClassName)
+        {
+            NSLog(@"found, returned %@", strClass);
+            return controller;
+        }
+
+        presentedController = controller.presentedViewController;
+    }
+
+
+    NSLog(@"returned %@", NSStringFromClass([controller class]));
+    return controller;
+}
+
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(launchCamera:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback)
@@ -82,7 +121,7 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
             }
         }
 
-        UIViewController *root = RCTPresentedViewController();
+        UIViewController *root = RCTPresentedViewControllerCustom();
 
         /* On iPad, UIAlertController presents a popover view rather than an action sheet like on iPhone. We must provide the location
         of the location to show the popover in this case. For simplicity, we'll just display it on the bottom center of the screen
@@ -188,7 +227,7 @@ RCT_EXPORT_METHOD(showImagePicker:(NSDictionary *)options callback:(RCTResponseS
     // Check permissions
     void (^showPickerViewController)() = ^void() {
         dispatch_async(dispatch_get_main_queue(), ^{
-            UIViewController *root = RCTPresentedViewController();
+            UIViewController *root = RCTPresentedViewControllerCustom();
             [root presentViewController:self.picker animated:YES completion:nil];
         });
     };
