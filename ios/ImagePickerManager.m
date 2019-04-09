@@ -26,37 +26,18 @@ UIViewController *__nullable RCTPresentedViewControllerCustom(void)
         return nil;
     }
 
-    NSString *neededClassName = @"eportrait_sdk.EPortraitSDKViewController";
-    UIViewController *controller = RCTKeyWindow().rootViewController;
-    UIViewController *presentedController = controller.presentedViewController;
+    UIViewController *topViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
 
-    NSLog(@"Needed viewcontroller %@",  neededClassName);
-    NSLog(@"controller %@", NSStringFromClass([controller class]));
-    NSLog(@"presentedController %@", NSStringFromClass([presentedController class]));
+    NSString *strClass = NSStringFromClass([topViewController class]);
+    NSLog(@"Root %@", NSStringFromClass([topViewController class]));
 
-
-
-    while (presentedController && ![presentedController isBeingDismissed]) {
-
-        controller = presentedController;
-
-        NSString *strClass = NSStringFromClass([controller class]);
-
-
-        NSLog(@"Testing %@", strClass);
-
-        if (strClass == neededClassName)
-        {
-            NSLog(@"found, returned %@", strClass);
-            return controller;
-        }
-
-        presentedController = controller.presentedViewController;
+    while (topViewController.presentedViewController) {
+        topViewController = topViewController.presentedViewController;
+        NSLog(@"Testing %@", NSStringFromClass([topViewController class]));
     }
 
-
-    NSLog(@"returned %@", NSStringFromClass([controller class]));
-    return controller;
+    NSLog(@"Returning %@", NSStringFromClass([topViewController class]));
+    return topViewController;
 }
 
 RCT_EXPORT_MODULE();
