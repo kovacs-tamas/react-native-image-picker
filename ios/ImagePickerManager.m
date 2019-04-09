@@ -28,7 +28,6 @@ UIViewController *__nullable RCTPresentedViewControllerCustom(void)
 
     UIViewController *topViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
 
-    NSString *strClass = NSStringFromClass([topViewController class]);
     NSLog(@"Root %@", NSStringFromClass([topViewController class]));
 
     while (topViewController.presentedViewController) {
